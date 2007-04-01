@@ -111,7 +111,7 @@ $msg=Freenet::Message->new("ClientPut",
 	}
 );
 
-$data=read_file("c:/document.pdf",{binmode => ':raw'});
+$data=read_file("c:/document.pdf", binmode => ':raw');
 
 $msg->{data}=$data;
 $msg->{header}->{DataLength}=length($data);

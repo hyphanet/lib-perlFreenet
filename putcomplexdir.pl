@@ -10,12 +10,12 @@ $node=Freenet::Connection->new({Node => 'localhost', Client=>'perl putcomplexdir
 ($nodehello=$node->connect) || warn "connect failed\n";
 
 if($nodehello->message ne "NodeHello") {
-  warn "something went wrong, got ".$nodehello->message." instread of NodeHello\n";
+  warn "something went wrong, got ".$nodehello->message." instead of NodeHello\n";
 }
 
 $file0=read_file("index.html");
-$file1=read_file("foo.zip",{binmode=>':raw'});
-$file2=read_file("doc.pdf",{binmode=>':raw'});
+$file1=read_file("foo.zip", binmode=>':raw');
+$file2=read_file("doc.pdf", binmode=>':raw');
 
 $msg=Freenet::Message->new("ClientPutComplexDir",
 	{
