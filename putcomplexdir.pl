@@ -6,7 +6,7 @@ use File::Slurp;
 use Freenet::Message;
 use Freenet::Connection;
 
-$node=Freenet::Connection->new({Node => '192.168.178.20', Client=>'perl putcomplexdir', Debug=>1});
+$node=Freenet::Connection->new({Node => 'localhost', Client=>'perl putcomplexdir', Debug=>1});
 ($nodehello=$node->connect) || warn "connect failed\n";
 
 if($nodehello->message ne "NodeHello") {
