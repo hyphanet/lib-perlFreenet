@@ -1,0 +1,24 @@
+Perl support for Freenet
+
+This is still very preliminary, you can connect to the server and send/received 
+messages including data. Some examples are in perlfn.pl and in putcomplexdir.pl.
+
+There is no support for waiting for or polling messages yet, so longer 
+operations will probably not work and you cannot start more than one operation 
+unless you take care of sorting the progress messages yourself.
+
+Right now there is no Makefile.PL nor PPM, you can either keep the Freenet 
+directory in your local dir or copy them to lib/perl/<version>/
+
+There are quite a few things missing, e.g. Perldoc.
+
+Until now, I have used the library under Windows only (Vista and XP) with 
+ActiveState Perl 5.8.8, it should work under Linux as well, but this is yet 
+untested.
+
+For feedback about the code, please use devel@P7LnnR2qMOTZdYbBa_teC92vTLQ in 
+[MAILBOX] or use the bug tracker at https://bugs.freenetproject.org/ 
+(perlFreenet)
+
+Thats all for now, I'll leave you to finding your own bugs ...
+
