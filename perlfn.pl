@@ -10,13 +10,18 @@ $node=Freenet::Connection->new({Node => 'localhost', Client=>'perl testclient', 
 ($nodehello=$node->connect) || warn "connect failed\n";
 
 if($nodehello->message ne "NodeHello") {
-  warn "something went wrong, got ".$nodehello->message." instead of NodeHello\n";
+  die "something went wrong, got ".$nodehello->message." instead of NodeHello\n";
 }
 
 # get uptime
 $node->sendmessage("GetNode", {WithVolatile => 'true'});
 $nodedata=$node->getmessage;
-$uptime=$nodedata->header("volatile.uptimeSeconds")/3600.0;
+# you can reference nested keywords either directly or by the parent hash:
+
+#$uptime=$nodedata->header("volatile.uptimeSeconds")/3600.0;
+$volatile=$nodedata->header("volatile");
+$uptime=$volatile->{"uptimeSeconds"}/3600.0;
+
 print "uptime $uptime hours\n";
 
 # get a list of peer node names
@@ -37,6 +42,8 @@ while(1) {
   }
 	last if $msg->message eq "EndListPeers";
 };
+
+exit;
 
 $node->sendmessage("ClientGet",
 	{
@@ -84,11 +91,6 @@ write_file("test.png", {binmode => ':raw' }, $msg->data);
 $node->sendmessage("GenerateSSK", {Identifier=>"My Identifier Blah Blah"});
 print $node->getmessage->as_string;
 
-# shut down node (you probably dont want to do this is a test script)
-
-#$node->sendmessage("Shutdown");
-#print $node->getmessage->as_string;
-
 # get CHK of a known file
 
 # have to create the message beforehand since we have to add data element
@@ -111,7 +113,7 @@ $msg=Freenet::Message->new("ClientPut",
 	}
 );
 
-$data=read_file("c:/document.pdf", binmode => ':raw');
+$data=read_file("document.pdf", binmode => ':raw');
 
 $msg->{data}=$data;
 $msg->{header}->{DataLength}=length($data);
@@ -120,6 +122,11 @@ $node->sendmessage($msg);
 
 my($msg)=$node->getmessage;
 print $msg->as_string;
+
+# shut down node (you probably dont want to do this is a test script)
+
+#$node->sendmessage("Shutdown");
+#print $node->getmessage->as_string;
 
 $node->disconnect || warn "disconnect failed\n";
 

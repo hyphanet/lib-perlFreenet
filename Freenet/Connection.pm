@@ -1,7 +1,7 @@
 package Freenet::Connection;
 
 use Freenet::Message;
-use IO::socket::INET;
+use IO::Socket::INET;
 
 sub new {
   my $class = shift;
@@ -122,7 +122,18 @@ sub getmessage
     last if /^EndMessage$/;
     last if /^Data$/;
     my($k,$v)=split(/=/,$_,2);
-    $headers->{$k}=$v;
+    # handle keyword.keyword
+    if($k=~/^([^.]+)\.(.+)$/) {
+    	my($ref)=\%{$headers->{$1}};
+    	my($subkey)=$2;
+    	while($subkey=~/^([^.]+)\.(.+)$/) {
+    		$ref=\%{$ref->{$1}};
+    		$subkey=$2;
+    	}
+    	$ref->{$subkey}=$v;
+    } else {
+    	$headers->{$k}=$v;
+    }
   }
 
   if(/^Data$/) {
@@ -164,8 +175,7 @@ sub sendmessage
 
   foreach my $k (keys(%{$msg->header})) {
   	my($h)=$msg->header($k);
-    print $sock "$k=$h\n";
-    $self->debug && print ">$k=$h\n";
+   	$self->print_msghash($k, $h);
   }
 
   print $sock "EndMessage\n";
@@ -178,6 +188,33 @@ sub sendmessage
   }
 
   return 1;
+}
+
+sub print_msghash
+{
+  my($self)=shift;
+  my($key)=shift;
+  my($value)=shift;
+  my($sock)=$self->{socket};
+
+  if(ref($value)) {
+  	if(ref($value) eq "ARRAY") {
+  		for(my $i=0;$i<int(@$value);$i++) {
+  			$self->print_msghash("$key.$i",$value->[$i]);
+  		}
+  	}
+  	elsif(ref($value) eq "HASH") {
+  		foreach my $k (keys(%$value)) {
+  			$self->print_msghash("$key.$k",$value->{$k});
+  		}
+  	}
+  	else {
+  		warn "unsupported value type ".ref($value)."\n";
+  	}
+  } else {
+  	print $sock "$key=$value\n";
+  	$self->debug && print ">$key=$value\n";
+  }
 }
 
 sub disconnect

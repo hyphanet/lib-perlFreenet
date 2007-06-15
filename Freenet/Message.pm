@@ -39,13 +39,27 @@ sub header
 	if(int(@_)==0) {
     return $self->{header};
 	} else {
-		my $k=shift;
-    return $self->{header}->{$k};
+		my @keys;
+		if(int(@_)>1) {
+			@keys=@_;
+		} else {
+			my $key=shift;
+			@keys=split(/\./,$key);
+		}
+		my $ref=$self->{header};
+		foreach my $k (@keys) {
+			$ref=$ref->{$k};
+			if(!defined($ref)) {
+				return undef;
+			}
+		}
+    return $ref;
 	}
 }
 
 # as_string is useful for debugging, returns the complete message ending
 # with either EndMessage or Data
+# TODO: this duplicates code from Freenet::Connection
 
 sub as_string
 {
@@ -53,7 +67,7 @@ sub as_string
 	
 	my($s)=$self->message."\n";
 	foreach my $k (keys(%{$self->header})) {
-	  $s.=$k."=".$self->header($k)."\n";
+	  $s.=$self->string_msghash($k, $self->header->{$k});;
 	}
 	if(defined($self->data)) {
 		# ignore the data field for now
@@ -62,6 +76,34 @@ sub as_string
 	  $s.="EndMessage\n";
   }
 	return $s;
+}
+
+sub string_msghash
+{
+  my($self)=shift;
+  my($key)=shift;
+  my($value)=shift;
+
+	my($res)="";
+
+  if(ref($value)) {
+  	if(ref($value) eq "ARRAY") {
+  		for(my $i=0;$i<int(@$value);$i++) {
+  			$res.=$self->string_msghash("$key.$i",$value->[$i]);
+  		}
+  	}
+  	elsif(ref($value) eq "HASH") {
+  		foreach my $k (keys(%$value)) {
+  			$res.=$self->string_msghash("$key.$k",$value->{$k});
+  		}
+  	}
+  	else {
+  		warn "unsupported value type ".ref($value)."\n";
+  	}
+  } else {
+  	$res.="$key=$value\n";
+  }
+  return $res;
 }
 
 1;

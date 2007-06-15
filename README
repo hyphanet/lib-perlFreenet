@@ -12,9 +12,8 @@ directory in your local dir or copy them to lib/perl/<version>/
 
 There are quite a few things missing, e.g. Perldoc.
 
-Until now, I have used the library under Windows only (Vista and XP) with 
-ActiveState Perl 5.8.8, it should work under Linux as well, but this is yet 
-untested.
+I am developing the library under Windows only (Vista and XP) with ActiveState 
+Perl 5.8.8, but it has been tested under Linux as well.
 
 For feedback about the code, please use devel@P7LnnR2qMOTZdYbBa_teC92vTLQ in 
 [MAILBOX] or use the bug tracker at https://bugs.freenetproject.org/ 
