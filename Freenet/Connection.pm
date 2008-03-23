@@ -69,7 +69,8 @@ sub connect
 	$socket=IO::Socket::INET->new(PeerAddr => $self->{node});
 
 	if(!$socket) {
-		# failed for some reason TODO: should wrap this is a proper error?
+		# failed for some reason
+		# TODO: should wrap this is a proper error?
 		return undef;
 	}
 
@@ -95,9 +96,16 @@ sub connect
   return $response;
 }
 
+sub is_connected
+{
+  return defined($_[0]->{socket});
+}
+
 sub getmessage
 {
   my $self=shift;
+
+  return undef if !$self->is_connected();
 
   my $socket=$self->{socket};
 
@@ -166,6 +174,8 @@ sub sendmessage
   }
   my $sock=$self->{socket};
 
+  return undef if !$self->is_connected();
+
   if(!ref($msg) eq "Freenet::Message") {
     warn "wrong argument type\n";
   }
@@ -221,6 +231,8 @@ sub disconnect
 {
   my $self=shift;
   my $ret;
+
+  return undef if !$self->is_connected();
 
   $ret=close($self->{socket});
   $self->{socket}=undef;

@@ -14,8 +14,8 @@ sub initialize
 
     $self->{data}=undef;
     $self->{message}=shift;
-    # if we don't have header field, you can just leave them out
-    # e.g. ->new("ShutDown");
+    # if there are no header fields, you can just leave them out
+    # e.g. ->new("Shutdown");
     $self->{header}=shift || {};
 }
 
@@ -44,6 +44,11 @@ sub header
 			@keys=@_;
 		} else {
 			my $key=shift;
+			if($key=~/\./) {
+				if(defined($self->{header}->{$key})) {
+					return $self->{header}->{$key}
+				}
+			}
 			@keys=split(/\./,$key);
 		}
 		my $ref=$self->{header};
